@@ -3,8 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const ADMIN_PASSWORD = "hitters2026";
 const VIEWER_PASSWORD = "ancienthitters2026";
@@ -14,12 +13,23 @@ app.use(express.static("public"));
 
 const NOTES_FILE = path.join(__dirname, "notes.json");
 
+function ensureNotesFile() {
+    if (!fs.existsSync(NOTES_FILE)) {
+        fs.writeFileSync(NOTES_FILE, "[]", "utf8");
+    }
+}
+
 function getNotes() {
-    return JSON.parse(fs.readFileSync(NOTES_FILE, "utf8"));
+    ensureNotesFile();
+    try {
+        return JSON.parse(fs.readFileSync(NOTES_FILE, "utf8"));
+    } catch {
+        return [];
+    }
 }
 
 function saveNotes(notes) {
-    fs.writeFileSync(NOTES_FILE, JSON.stringify(notes, null, 2));
+    fs.writeFileSync(NOTES_FILE, JSON.stringify(notes, null, 2), "utf8");
 }
 
 app.post("/login", (req, res) => {
@@ -28,18 +38,18 @@ app.post("/login", (req, res) => {
     if (password === ADMIN_PASSWORD) {
         return res.json({
             success: true,
-            role: "admin"
+            role: "post"
         });
     }
 
     if (password === VIEWER_PASSWORD) {
         return res.json({
             success: true,
-            role: "viewer"
+            role: "view"
         });
     }
 
-    res.json({
+    return res.json({
         success: false
     });
 });
@@ -49,7 +59,6 @@ app.get("/notes", (req, res) => {
 });
 
 app.post("/notes", (req, res) => {
-
     const { password, title, content } = req.body;
 
     if (password !== ADMIN_PASSWORD) {
@@ -58,16 +67,22 @@ app.post("/notes", (req, res) => {
         });
     }
 
+    if (!title || !content) {
+        return res.status(400).json({
+            error: "Title and content are required"
+        });
+    }
+
     const notes = getNotes();
 
     const newNote = {
+        id: Date.now(),
         title,
         content,
         date: new Date().toLocaleString()
     };
 
     notes.unshift(newNote);
-
     saveNotes(notes);
 
     res.json({
