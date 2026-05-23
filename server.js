@@ -91,5 +91,10 @@ app.post("/notes", (req, res) => {
 });
 
 app.listen(PORT, () => {
+    function isNewNote(note, notes) {
+  if (!notes.length) return false;
+  return note.id === notes[0].id;
+}
+    const newFlag = isNewNote(note, notes);
     console.log(`Server running on port ${PORT}`);
 });
