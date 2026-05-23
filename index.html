@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Church Notes</title>
+    <style>
+        :root {
+            --bg: #0b0b0b;
+            --panel: #151515;
+            --panel-2: #101010;
+            --text: #f2f2f2;
+            --muted: #9a9a9a;
+            --red: #b40000;
+            --red-2: #ff2a2a;
+            --border: #2a2a2a;
+            --shadow: rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at top, rgba(180, 0, 0, 0.12), transparent 35%),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 28px 16px 40px;
+        }
+
+        .wrap {
+            width: min(980px, 100%);
+            margin: 0 auto;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            letter-spacing: 3px;
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            color: var(--muted);
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent), var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 18px 50px var(--shadow);
+        }
+
+        .login {
+            width: min(430px, 100%);
+            margin: 30px auto 0;
+            padding: 22px;
+        }
+
+        .login h2 {
+            margin: 0 0 12px;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 8px;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #343434;
+            background: var(--panel-2);
+            color: var(--text);
+            border-radius: 12px;
+            outline: none;
+            padding: 13px 14px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: rgba(255, 42, 42, 0.65);
+            box-shadow: 0 0 0 3px rgba(180, 0, 0, 0.18);
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        button {
+            border: 0;
+            border-radius: 12px;
+            background: var(--red);
+            color: white;
+            padding: 12px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.2s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
+            background: #d10000;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .shake {
+            animation: shake 0.42s linear;
+            border-color: var(--red-2) !important;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            15% {
+                transform: translateX(-8px);
+            }
+
+            30% {
+                transform: translateX(8px);
+            }
+
+            45% {
+                transform: translateX(-6px);
+            }
+
+            60% {
+                transform: translateX(6px);
+            }
+
+            75% {
+                transform: translateX(-4px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .error {
+            margin-top: 10px;
+            min-height: 20px;
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+
+        .topbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 24px 0 18px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 14px;
+            border-radius: 999px;
+            color: #f1f1f1;
+        }
+
+        .role {
+            color: #ff6d6d;
+            font-weight: 700;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .composer {
+            padding: 20px;
+        }
+
+        .composer h2,
+        .feed h2 {
+            margin-top: 0;
+        }
+
+        .composer-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .ghost {
+            background: transparent;
+            border: 1px solid #3a3a3a;
+        }
+
+        .ghost:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .feed {
+            padding: 18px;
+        }
+
+        .empty {
+            padding: 26px 18px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed #383838;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .note {
+            position: relative;
+            margin-top: 14px;
+            padding: 18px;
+            border-radius: 16px;
+            background: #121212;
+            border: 1px solid #2b2b2b;
+            overflow: hidden;
+        }
+
+        .note.new {
+            border-color: rgba(255, 42, 42, 0.9);
+            box-shadow: 0 0 0 1px rgba(255, 42, 42, 0.35), 0 0 18px rgba(255, 42, 42, 0.12);
+        }
+
+        .note.new::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(255, 42, 42, 0.25);
+            border-radius: 16px;
+            pointer-events: none;
+        }
+
+        .note-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .note-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+
+        .new-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: rgba(180, 0, 0, 0.14);
+            border: 1px solid rgba(255, 42, 42, 0.65);
+            color: #ff5e5e;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            white-space: pre-wrap;
+            line-height: 1.55;
+            color: #ebebeb;
+        }
+
+        .footer-note {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="hero">
+            <h1>CHURCH NOTES</h1>
+            <p>Ancient Hitters</p>
+        </div>
+
+        <div id="loginCard" class="card login">
+            <h2>Enter Password</h2>
+            <label for="passwordInput">Password</label>
+            <input id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password" />
+            <div id="loginError" class="error"></div>
+            <button id="loginBtn" type="button">Enter</button>
+        </div>
+
+        <div id="app" class="hidden">
+            <div class="topbar">
+                <div class="pill">
+                    Logged in as <span id="roleLabel" class="role"></span>
+                </div>
+                <button id="logoutBtn" class="ghost" type="button">Logout</button>
+            </div>
+
+            <div id="composerCard" class="card composer hidden">
+                <h2>Post Church Note</h2>
+
+                <label for="noteTitle">Title</label>
+                <input id="noteTitle" type="text" placeholder="Note title" maxlength="120" />
+
+                <label for="noteBody">Note</label>
+                <textarea id="noteBody" placeholder="Write the note here..." maxlength="5000"></textarea>
+
+                <div class="composer-actions">
+                    <button id="postBtn" type="button">Post Note</button>
+                </div>
+            </div>
+
+            <div class="card feed">
+                <h2>Posted Notes</h2>
+                <div id="notesContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            query,
+            orderBy,
+            onSnapshot,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+           apiKey: "AIzaSyCevvGSgLJrLkeMYax0iwmUBVCqShMO4fI",
+  authDomain: "churchnotes-7a8bb.firebaseapp.com",
+  projectId: "churchnotes-7a8bb",
+  storageBucket: "churchnotes-7a8bb.firebasestorage.app",
+  messagingSenderId: "719609865057",
+  appId: "1:719609865057:web:c45442723668dc30045b20",
+  measurementId: "G-JPTWQ3ZGYQ"
+};
+        const ADMIN_PASSWORD = "hitters2026";
+        const VIEWER_PASSWORD = "ancienthitters2026";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const loginCard = document.getElementById("loginCard");
+        const loginInput = document.getElementById("passwordInput");
+        const loginBtn = document.getElementById("loginBtn");
+        const loginError = document.getElementById("loginError");
+
+        const appWrap = document.getElementById("app");
+        const composerCard = document.getElementById("composerCard");
+        const roleLabel = document.getElementById("roleLabel");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        const notesContainer = document.getElementById("notesContainer");
+        const noteTitle = document.getElementById("noteTitle");
+        const noteBody = document.getElementById("noteBody");
+        const postBtn = document.getElementById("postBtn");
+
+        let currentRole = "";
+        let unsubscribe = null;
+
+        function setLoginError(message) {
+            loginError.textContent = message || "";
+        }
+
+        function shakeLogin() {
+            loginCard.classList.remove("shake");
+            void loginCard.offsetWidth;
+            loginCard.classList.add("shake");
+            setTimeout(() => loginCard.classList.remove("shake"), 450);
+        }
+
+        function showNotesPlaceholder() {
+            notesContainer.innerHTML = `<div class="empty">No notes posted</div>`;
+        }
+
+        function formatTimestamp(ts) {
+            if (!ts) return "Just now";
+            const date = ts.toDate ? ts.toDate() : new Date(ts);
+            return date.toLocaleString();
+        }
+
+        function isNewNote(note) {
+            const source = note.createdAt?.toDate
+                ? note.createdAt.toDate()
+                : note.clientCreatedAt
+                    ? new Date(note.clientCreatedAt)
+                    : null;
+
+            if (!source) return false;
+
+            const ageMs = Date.now() - source.getTime();
+            return ageMs <= 24 * 60 * 60 * 1000;
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function renderNotes(notes) {
+            if (!notes.length) {
+                showNotesPlaceholder();
+                return;
+            }
+
+            notesContainer.innerHTML = notes.map((note) => {
+                const newFlag = isNewNote(note);
+                const badge = newFlag ? `<span class="new-badge">New</span>` : "";
+                const noteClass = newFlag ? "note new" : "note";
+
+                return `
+          <article class="${noteClass}">
+            <div class="note-head">
+              <h3 class="note-title">${escapeHtml(note.title || "Untitled")}</h3>
+              ${badge}
+            </div>
+            <div class="meta">${formatTimestamp(note.createdAt || note.clientCreatedAt)}</div>
+            <div class="content">${escapeHtml(note.content || "")}</div>
+          </article>
+        `;
+            }).join("");
+        }
+
+        function startNotesListener() {
+            if (unsubscribe) unsubscribe();
+
+            const notesQuery = query(
+                collection(db, "churchNotes"),
+                orderBy("createdAt", "desc")
+            );
+
+            unsubscribe = onSnapshot(notesQuery, (snapshot) => {
+                const notes = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                renderNotes(notes);
+            }, () => {
+                notesContainer.innerHTML = `<div class="empty">Could not load notes.</div>`;
+            });
+        }
+
+        function enterApp(role) {
+            currentRole = role;
+            loginCard.classList.add("hidden");
+            appWrap.classList.remove("hidden");
+            roleLabel.textContent = role === "post" ? "Post" : "View";
+
+            if (role === "post") {
+                composerCard.classList.remove("hidden");
+            } else {
+                composerCard.classList.add("hidden");
+            }
+
+            startNotesListener();
+        }
+
+        async function handleLogin() {
+            const password = loginInput.value.trim();
+
+            if (!password) {
+                setLoginError("Enter a password.");
+                shakeLogin();
+                return;
+            }
+
+            if (password === ADMIN_PASSWORD) {
+                setLoginError("");
+                enterApp("post");
+                return;
+            }
+
+            if (password === VIEWER_PASSWORD) {
+                setLoginError("");
+                enterApp("view");
+                return;
+            }
+
+            setLoginError("Wrong password");
+            shakeLogin();
+            loginInput.select();
+        }
+
+        async function postNote() {
+            const title = noteTitle.value.trim();
+            const content = noteBody.value.trim();
+
+            if (!title || !content) {
+                alert("Fill out both the title and the note.");
+                return;
+            }
+
+            postBtn.disabled = true;
+            postBtn.textContent = "Posting...";
+
+            try {
+                await addDoc(collection(db, "churchNotes"), {
+                    title,
+                    content,
+                    createdAt: serverTimestamp(),
+                    clientCreatedAt: Date.now(),
+                    postedBy: currentRole
+                });
+
+                noteTitle.value = "";
+                noteBody.value = "";
+            } catch (err) {
+                alert("Could not post the note.");
+                console.error(err);
+            } finally {
+                postBtn.disabled = false;
+                postBtn.textContent = "Post Note";
+            }
+        }
+
+        loginBtn.addEventListener("click", handleLogin);
+        loginInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") handleLogin();
+        });
+
+        postBtn.addEventListener("click", postNote);
+
+        logoutBtn.addEventListener("click", () => {
+            if (unsubscribe) unsubscribe();
+            unsubscribe = null;
+            currentRole = "";
+            loginInput.value = "";
+            loginError.textContent = "";
+            loginCard.classList.remove("hidden");
+            appWrap.classList.add("hidden");
+            composerCard.classList.add("hidden");
+            notesContainer.innerHTML = "";
+        });
+    </script>
+</body>
+
+</html>
