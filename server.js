@@ -5,8 +5,8 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const ADMIN_PASSWORD = "hitters2026";
-const VIEWER_PASSWORD = "ancienthitters2026";
+const ADMIN_PASSWORD = "hitters1";
+const VIEWER_PASSWORD = "ancienthitters1";
 
 app.use(express.json());
 app.use(express.static("public"));
